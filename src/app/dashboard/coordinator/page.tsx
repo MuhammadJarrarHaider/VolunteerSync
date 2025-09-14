@@ -1,4 +1,3 @@
-
 "use client";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useMemo, useCallback } from 'react';
@@ -57,7 +56,7 @@ const taskSchema = z.object({
 });
 
 const aiTaskSchema = z.object({
-    prompt: z.string().min(10, "Please describe the task you want to create in more detail.")
+    idea: z.string().min(10, "Please describe the task you want to create in more detail.")
 })
 
 type TaskFormValues = z.infer<typeof taskSchema>;
@@ -126,7 +125,7 @@ export default function CoordinatorDashboardPage() {
     const aiForm = useForm<AiTaskFormValues>({
         resolver: zodResolver(aiTaskSchema),
         defaultValues: {
-            prompt: ""
+            idea: ""
         }
     })
 
@@ -235,7 +234,7 @@ export default function CoordinatorDashboardPage() {
      const onAiSubmit = async (data: AiTaskFormValues) => {
         setIsGenerating(true);
         try {
-            const result = await generateTask({ prompt: data.prompt });
+            const result = await generateTask({ idea: data.idea });
             form.setValue('title', result.title);
             form.setValue('description', result.description);
             form.setValue('location', result.location);
@@ -638,7 +637,7 @@ export default function CoordinatorDashboardPage() {
                                                 </DialogHeader>
                                                 <Form {...aiForm}>
                                                         <form onSubmit={aiForm.handleSubmit(onAiSubmit)} className="space-y-4">
-                                                            <FormField control={aiForm.control} name="prompt" render={({ field }) => (
+                                                            <FormField control={aiForm.control} name="idea" render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormLabel>Task Idea</FormLabel>
                                                                     <FormControl><Textarea placeholder="E.g., A community clean-up event at the local park..." {...field} /></FormControl>
