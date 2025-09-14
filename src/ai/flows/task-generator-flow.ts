@@ -11,7 +11,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const GenerateTaskInputSchema = z.object({
-  prompt: z.string().describe('A short description or idea for a volunteer task.'),
+  idea: z.string().describe('A short description or idea for a volunteer task.'),
 });
 export type GenerateTaskInput = z.infer<typeof GenerateTaskInputSchema>;
 
@@ -30,9 +30,9 @@ const prompt = ai.definePrompt({
   name: 'generateTaskPrompt',
   input: { schema: GenerateTaskInputSchema },
   output: { schema: GenerateTaskOutputSchema },
-  prompt: `You are an expert at creating engaging volunteer opportunities. Based on the user's prompt, generate a creative task title, a detailed description, and a suitable location.
+  prompt: `You are an expert at creating engaging volunteer opportunities. Based on the user's idea, generate a creative task title, a detailed description, and a suitable location.
 
-  Prompt: {{{prompt}}}
+  Idea: {{{idea}}}
   
   Generate a response in the specified format. The tone should be inspiring and community-focused. The location should make sense for the task described.`,
 });
