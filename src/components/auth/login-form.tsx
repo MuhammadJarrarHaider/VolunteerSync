@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { FC } from 'react';
@@ -11,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { ref, get } from 'firebase/database';
 import { useToast } from '@/hooks/use-toast';
 import type { AuthType } from './auth-card';
 
@@ -41,8 +43,21 @@ const LoginForm: FC<LoginFormProps> = ({ setAuthType }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-      // Let the auth provider handle redirect
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+
+      // Check user role to prevent admin login from public page
+      const userRef = ref(db, `users/${user.uid}`);
+      const snapshot = await get(userRef);
+
+      if (snapshot.exists() && snapshot.val().role === 'admin') {
+          // If user is an admin, sign them out and throw a generic error
+          await auth.signOut();
+          // This error will be caught by the catch block below, showing the generic message
+          throw new Error("auth/invalid-credential");
+      } 
+      // If not an admin, the auth provider will handle the redirect automatically.
+      // No 'else' block needed here.
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -137,5 +152,3 @@ const LoginForm: FC<LoginFormProps> = ({ setAuthType }) => {
 };
 
 export default LoginForm;
-
-    
