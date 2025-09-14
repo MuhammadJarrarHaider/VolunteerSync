@@ -15,7 +15,11 @@ async function initializeAdminApp() {
   const serviceAccount: ServiceAccount = {
     projectId: process.env.FIREBASE_PROJECT_ID!,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
-    privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    // When deployed to Vercel, the private key is not escaped.
+    // In a local .env file, it needs to be wrapped in quotes with `\n` for newlines.
+    privateKey: process.env.VERCEL
+      ? process.env.FIREBASE_PRIVATE_KEY
+      : (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
   };
 
   try {
